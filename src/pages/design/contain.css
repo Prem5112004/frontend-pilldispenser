@@ -1,0 +1,17 @@
+.card-base{
+    background-color: #ffffff;
+    border: solid 0.5px #bebcbc;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 60%;
+    margin: 20px;
+}
+
+.card-details{
+    background-color: #ffffff;
+    border: solid 0.5px #636363;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px;
+    max-width:80%;
+}

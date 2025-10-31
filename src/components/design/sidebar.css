@@ -1,0 +1,23 @@
+/* Default button style */
+.base-bg{
+    background-color: #0d8dfd;
+}
+
+.btn-custom {
+  background-color: #0d8dfd;   /* bootstrap primary blue */
+  color: white;
+  width:100%;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-weight: 500;
+  border: none;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Hover effect */
+.btn-custom:hover {
+  background-color: #0f0898;   /* darker blue */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  color: #fff;
+}
