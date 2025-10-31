@@ -11,12 +11,12 @@ function Login(){
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/doctors/login',{ id, password });
+      const res = await axios.post('https://pilldispenser.onrender.com/api/doctors/login',{ id, password });
       navigate(`/dashboard/${res.data.doctor.id}`, { state: { doctor: res.data.doctor } });
     } catch (err) {
       setErr(err.response?.data?.message || 'Login failed');
     }
-  };
+  };``
 
   return (
     <div className="container mt-5">

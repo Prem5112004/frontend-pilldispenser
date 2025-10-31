@@ -16,7 +16,7 @@ function AddPatient() {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/patients/add', {
+      await axios.post('https://pilldispenser.onrender.com/api/patients/add', {
         id,         // ✅ send patientId
         name,
         age,

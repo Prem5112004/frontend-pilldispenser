@@ -13,10 +13,10 @@ function PatientDetails() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const pres = await axios.get(`http://localhost:5000/api/patient/${id}`);
+        const pres = await axios.get(`https://pilldispenser.onrender.com/api/patient/${id}`);
         setPatient(pres.data);
 
-        const mres = await axios.get(`http://localhost:5000/api/medicines/${id}`);
+        const mres = await axios.get(`https://pilldispenser.onrender.com/api/medicines/${id}`);
         setMedicines(mres.data);
       } catch (err) {
         console.error("Error fetching patient details:", err.message);
@@ -30,7 +30,7 @@ function PatientDetails() {
       return;
     }
     try {
-      await axios.delete(`http://localhost:5000/api/patient/${id}`);
+      await axios.delete(`https://pilldispenser.onrender.com/api/patient/${id}`);
       alert('Patient and medicines deleted');
       navigate(`/patients/${doctorId}`);
     } catch (err) {
@@ -44,7 +44,7 @@ function PatientDetails() {
       return;
     }
     try {
-      await axios.delete(`http://localhost:5000/api/medicines/${mid}`);
+      await axios.delete(`https://pilldispenser.onrender.com/api/medicines/${mid}`);
       setMedicines(medicines.filter(m => m.id !== mid));
     } catch (err) {
       console.error(err);

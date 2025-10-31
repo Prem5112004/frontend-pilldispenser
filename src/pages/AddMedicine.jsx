@@ -15,7 +15,7 @@ function AddMedicine() {
  useEffect(() => {
   const fetchSlots = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/patient-slots/${patientId}`);
+      const res = await axios.get(`https://pilldispenser.onrender.com/api/patient-slots/${patientId}`);
       setSlots(res.data); // this will be an object: { S1: "A", S2: "B", S3: "C" }
     } catch (err) {
       console.error("Error fetching slots:", err.message);
@@ -34,7 +34,7 @@ function AddMedicine() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/medicines/add", {
+      await axios.post("https://pilldispenser.onrender.com/api/medicines/add", {
         name,
         scheduledTime,
         patientId,

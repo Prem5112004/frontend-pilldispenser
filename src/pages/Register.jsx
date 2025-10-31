@@ -12,7 +12,7 @@ function Register(){
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/doctors/register',{ id, name, password });
+      const res = await axios.post('https://pilldispenser.onrender.com/api/doctors/register',{ id, name, password });
       setMsg(res.data.message);
       setTimeout(()=>navigate('/'),1200);
     } catch (err) {
