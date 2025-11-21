@@ -1,88 +1,179 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
+import {
+  Box, Container, Card, CardContent, Typography, Button, TextField, Snackbar, Alert, InputAdornment, MenuItem, IconButton
+} from "@mui/material";
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
-import '../pages/design/contain.css';
+import format from 'date-fns/format';
+
 function AddMedicine() {
   const { patientId, doctorId } = useParams();
-  const [slots, setSlots] = useState([]);
-  const [selectedSlot, setSelectedSlot] = useState("");
-  const [newMed, setNewMed] = useState("");
-  const [scheduledTime, setTime] = useState("");
   const navigate = useNavigate();
+  const [patient, setPatient] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [medicineName, setMedicineName] = useState("");
+  const [scheduledTime, setScheduledTime] = useState(null); // Date object
+  const [successMsg, setSuccessMsg] = useState("");
+  const [failMsg, setFailMsg] = useState("");
 
- useEffect(() => {
-  const fetchSlots = async () => {
-    try {
-      const res = await axios.get(`https://pilldispenser.onrender.com/api/patient-slots/${patientId}`);
-      setSlots(res.data); // this will be an object: { S1: "A", S2: "B", S3: "C" }
-    } catch (err) {
-      console.error("Error fetching slots:", err.message);
-    }
-  };
-  fetchSlots();
-}, [patientId]);
+  useEffect(() => {
+    const fetchPatient = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/patient/${patientId}`);
+        setPatient(res.data);
+        setError("");
+      } catch{
+        setError("Patient not found.");
+        setPatient(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPatient();
+  }, [patientId]);
 
-
+  // Handles form submission
   const handleAdd = async (e) => {
     e.preventDefault();
-    const name = newMed || selectedSlot;
-    if (!name) {
-      alert("Please select or enter a medicine name");
-      return;
-    }
-
+    setSuccessMsg("");
+    setFailMsg("");
     try {
-      await axios.post("https://pilldispenser.onrender.com/api/medicines/add", {
-        name,
-        scheduledTime,
+      const time24 = scheduledTime ? format(scheduledTime, "HH:mm") : "";
+      const res = await axios.post("http://localhost:5000/api/medicines/add", {
+        name: medicineName,
+        scheduledTime: time24,
         patientId,
       });
-      alert("Medicine scheduled");
-      navigate(`/patient/${patientId}/${doctorId}`);
+      setSuccessMsg(res.data.message || "Medicine added!");
+      setMedicineName("");
+      setScheduledTime(null);
     } catch (err) {
-      alert(err.response?.data?.message || "Error adding medicine");
+      setFailMsg(err?.response?.data?.message || "Could not add medicine");
     }
   };
 
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", minHeight: "100vh" }}>
+        <Sidebar />
+        <Box sx={{ flexGrow: 1 }}>
+          <Navbar />
+          <Container maxWidth="sm" sx={{ mt: 10 }}>
+            <Typography variant="h5" align="center">Loading patient...</Typography>
+          </Container>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (error || !patient) {
+    return (
+      <Box sx={{ display: "flex", minHeight: "100vh" }}>
+        <Sidebar />
+        <Box sx={{ flexGrow: 1 }}>
+          <Navbar />
+          <Container maxWidth="sm" sx={{ mt: 10 }}>
+            <Typography variant="h6" align="center" color="error">{error}</Typography>
+          </Container>
+        </Box>
+      </Box>
+    );
+  }
+
   return (
-    <div className="d-flex">
+    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f8fafd" }}>
       <Sidebar />
-      <div className="flex-grow-1">
+      <Box sx={{ flexGrow: 1 }}>
         <Navbar />
-        <div className="container mt-4">
-          <h2>ADD MEDICINE</h2>
-          <form className="card-base" onSubmit={handleAdd}>
-            <div className="mb-3">
-              <label className="form-label">Enter New Medicine</label>
-              <input
-                type="text"
-                className="form-control"
-                value={newMed}
-                onChange={(e) => setNewMed(e.target.value)}
-                placeholder="Enter new medicine"
-              />
-            </div>
+        <Container maxWidth="sm" sx={{ mt: 5 }}>
+          <Card>
+            <CardContent>
+              <Typography variant="h5" color="primary" fontWeight="bold" gutterBottom>
+                Add Medicine For {patient.name}
+              </Typography>
+              <Box component="form" onSubmit={handleAdd} sx={{ mt: 3 }}>
+                <TextField
+                  fullWidth
+                  required
+                  label="Medicine Name"
+                  value={medicineName}
+                  onChange={(e) => setMedicineName(e.target.value)}
+                  sx={{ mb: 2 }}
+                />
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+  <TimePicker
+    ampm
+    label="Scheduled Time"
+    value={scheduledTime}
+    onChange={(time) => setScheduledTime(time)}
+    minutesStep={1}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        fullWidth
+        required
+        sx={{ mb: 2 }}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton>
+                <AccessTimeIcon />
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+    )}
+  />
+</LocalizationProvider>
 
-            <div className="mb-3">
-              <label className="form-label">Scheduled Time</label>
-              <input
-                type="time"
-                className="form-control"
-                value={scheduledTime}
-                onChange={(e) => setTime(e.target.value)}
-                required
-              />
-            </div>
-
-            <button type="submit" className="btn btn-success">
-              Add Medicine
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
+                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    disabled={!scheduledTime || !medicineName}
+                  >
+                    Add Medicine
+                  </Button>
+                </Box>
+              </Box>
+              <Button
+                sx={{ mt: 2 }}
+                color="secondary"
+                onClick={() => navigate(`/patient/${patientId}/${doctorId}`)}
+              >
+                Back to Patient Details
+              </Button>
+            </CardContent>
+          </Card>
+        </Container>
+        <Snackbar
+          open={!!successMsg}
+          autoHideDuration={4000}
+          onClose={() => setSuccessMsg("")}
+        >
+          <Alert onClose={() => setSuccessMsg("")} severity="success" variant="filled">
+            {successMsg}
+          </Alert>
+        </Snackbar>
+        <Snackbar
+          open={!!failMsg}
+          autoHideDuration={4000}
+          onClose={() => setFailMsg("")}
+        >
+          <Alert onClose={() => setFailMsg("")} severity="error" variant="filled">
+            {failMsg}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </Box>
   );
 }
 

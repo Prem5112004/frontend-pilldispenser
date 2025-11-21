@@ -1,85 +1,130 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState } from "react";
+import {
+  Box, Container, Card, CardContent, Typography, TextField, Button, MenuItem, Alert
+} from "@mui/material";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
-import '../pages/design/contain.css';
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
 function AddPatient() {
-  const { doctorId } = useParams();
-  const [id, setId] = useState('');   // ✅ new state for patientId
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
-  const [phoneno, setPhone] = useState('');
+  const { doctorId: paramDoctorId } = useParams();
+  const doctorId = paramDoctorId || localStorage.getItem("doctorId");
+  const [data, setData] = useState({
+    name: "",
+    age: "",
+    gender: "",
+    phoneno: "",
+    address: "",
+    username: "",
+    password: ""
+  });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
-  const handleAdd = async (e) => {
+  const handleChange = (e) => {
+    setData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); setSuccess("");
+    // Backend: expects: name, age, gender, phoneno, address, doctorId
+    if (!data.name || !data.age || !data.gender || !data.phoneno || !data.address || !data.username || !data.password) {
+      setError("All fields are required.");
+      return;
+    }
     try {
-      await axios.post('https://pilldispenser.onrender.com/api/patients/add', {
-        id,         // ✅ send patientId
-        name,
-        age,
-        phoneno,
-        doctorId
+      await axios.post("http://localhost:5000/api/patients/add", {
+        ...data,
+        doctorId // attach doctorId
       });
-      navigate(`/patients/${doctorId}`);
+      setSuccess("Patient added successfully.");
+      setTimeout(() => navigate(`/patients/${doctorId}`), 1500);
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || 'Error adding patient');
+      setError(err.response?.data?.message || "Error adding patient.");
     }
   };
 
   return (
-    <div className="d-flex">
+    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f8fafd" }}>
       <Sidebar />
-      <div className="flex-grow-1">
+      <Box sx={{ flexGrow: 1 }}>
         <Navbar />
-        <div className="container mt-4">
-          <h2>ADD PATIENT</h2>
-          <form className="card-base" onSubmit={handleAdd}>
-            <div className="mb-3">
-              <label>Patient ID</label>
-              <input
-                className="form-control"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label>Name</label>
-              <input
-                className="form-control"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label>Age</label>
-              <input
-                type="number"
-                className="form-control"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label>Phone</label>
-              <input
-                className="form-control"
-                value={phoneno}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
-            </div>
-            <button className="btn btn-success">Add Patient</button>
-          </form>
-        </div>
-      </div>
-    </div>
+        <Container maxWidth="sm" sx={{ mt: 6 }}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                <PersonAddIcon sx={{ color: "primary.main", fontSize: 38, mr: 1 }} />
+                <Typography variant="h5" fontWeight="bold" color="primary">
+                  Add New Patient
+                </Typography>
+              </Box>
+              <form onSubmit={handleSubmit} autoComplete="off">
+                <TextField
+                  label="Name" name="name" fullWidth required value={data.name}
+                  onChange={handleChange} sx={{ mb: 2 }} autoFocus
+                />
+                <TextField
+                  type="number" label="Age" name="age" fullWidth required value={data.age}
+                  onChange={handleChange} sx={{ mb: 2 }}
+                />
+                <TextField
+                  select label="Gender" name="gender" fullWidth required value={data.gender}
+                  onChange={handleChange} sx={{ mb: 2 }}
+                >
+                  <MenuItem value="">Select</MenuItem>
+                  <MenuItem value="Male">Male</MenuItem>
+                  <MenuItem value="Female">Female</MenuItem>
+                  <MenuItem value="Other">Other</MenuItem>
+                </TextField>
+                <TextField
+                  label="Phone Number" name="phoneno" fullWidth required value={data.phoneno}
+                  onChange={handleChange} sx={{ mb: 2 }}
+                />
+                <TextField
+                  label="Address" name="address" fullWidth required value={data.address}
+                  onChange={handleChange} sx={{ mb: 2 }}
+                />
+                 <TextField
+                  label="Patient Username" name="username" fullWidth required value={data.username} 
+                  onChange={handleChange} sx={{ mb: 2 }}
+                />
+                <TextField
+                  label="Patient Password" name="password" fullWidth type="password" required value={data.password}
+                  onChange={handleChange} sx={{ mb: 2 }}
+                />
+                {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+                {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  fullWidth
+                  sx={{ fontWeight: "bold", py: 1.2, mt: 1 }}
+                  type="submit"
+                >
+                  Add Patient
+                </Button>
+                <Button
+                  variant="text"
+                  fullWidth
+                  sx={{ mt: 1 }}
+                  onClick={() => navigate(`/patients/${doctorId}`)}
+                >
+                  Cancel
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </Container>
+      </Box>
+    </Box>
   );
 }
 

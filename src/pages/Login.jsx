@@ -1,44 +1,74 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import '../pages/design/contain.css'
-function Login(){
-  const [id,setId]=useState('');
-  const [password,setPassword]=useState('');
-  const [err,setErr]=useState('');
-  const navigate=useNavigate();
+import React, { useState } from "react";
+import {
+  Box, Card, CardContent, Typography, TextField, Button, Alert, InputAdornment, IconButton
+} from "@mui/material";
+import { Visibility, VisibilityOff, LocalHospital } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+function Login() {
+  const [id, setId] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPwd, setShowPwd] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
     try {
-      const res = await axios.post('https://pilldispenser.onrender.com/api/doctors/login',{ id, password });
-      navigate(`/dashboard/${res.data.doctor.id}`, { state: { doctor: res.data.doctor } });
+      const res = await axios.post("http://localhost:5000/api/doctors/login", { id, password });
+      localStorage.setItem("doctorId", res.data.doctor.id);
+      navigate(`/dashboard/${res.data.doctor.id}`);
     } catch (err) {
-      setErr(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || "Login failed");
     }
-  };``
+  };
 
   return (
-    <div className="container mt-5">
-      <h1 className='text-align-center'>MediTrack Pill Scheduler</h1>
-      <div className="card-base">
-      <h2>Doctor Login</h2><br/>
-      {err && <div className="alert alert-danger">{err}</div>}
-      <form onSubmit={handleLogin}>
-        <div className="mb-3">
-          <label>Doctor ID</label>
-          <input className="form-control" value={id} onChange={(e)=>setId(e.target.value)} required />
-        </div>
-        <div className="mb-3">
-          <label>Password</label>
-          <input type="password" className="form-control" value={password} onChange={(e)=>setPassword(e.target.value)} required />
-        </div>
-        <button className="btn btn-success">Login</button>
-      </form><br/>
-      <p className="mt-3">Don't have an account? <a href="/register">Register</a></p>
-    </div>
-    </div>
+    <Box sx={{ minHeight: "100vh", bgcolor: "#EAF1FB", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <Card sx={{ p: 2, maxWidth: 380, width: "100%", borderRadius: 3, boxShadow: 4 }}>
+        <CardContent>
+          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+            <LocalHospital color="primary" sx={{ fontSize: 40, mr: 1 }} />
+            <Typography variant="h5" color="primary" fontWeight="bold">
+              MediTrack Login
+            </Typography>
+          </Box>
+          <form onSubmit={handleLogin} autoComplete="off">
+            <TextField
+              label="Doctor ID"
+              fullWidth margin="normal" variant="outlined" value={id}
+              onChange={e => setId(e.target.value)} autoFocus required
+            />
+            <TextField
+              label="Password" fullWidth margin="normal"
+              type={showPwd ? "text" : "password"} variant="outlined"
+              value={password} onChange={e => setPassword(e.target.value)} required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPwd((s) => !s)} edge="end">
+                      {showPwd ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+            />
+            {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+            <Button fullWidth variant="contained" color="primary" size="large"
+              sx={{ mt: 3, py: 1.3, borderRadius: 1.5, fontWeight: "bold", fontSize: 16, letterSpacing: 1 }}
+              type="submit" disabled={!id || !password}>
+              Login
+            </Button>
+            <Button color="secondary" fullWidth sx={{ mt: 2, textTransform: "none", fontWeight: "medium" }}
+              onClick={() => navigate("/register")}>
+              <Typography component="span" variant="body2">New user?</Typography> Register here
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </Box>
   );
 }
-
 export default Login;

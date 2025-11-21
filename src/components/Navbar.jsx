@@ -1,31 +1,70 @@
-import { useNavigate, useParams} from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-function Navbar(){ 
-  const navigate = useNavigate();
-  const { doctorId } = useParams();
-  const [doctor, setDoctor] = useState(null);
+import React, { useEffect, useState } from "react";
+import {
+  AppBar, Toolbar, Typography, Box, Avatar, IconButton, Menu, MenuItem
+} from "@mui/material";
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
 
+function Navbar() {
+  const { doctorId: paramDoctorId } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [doctor, setDoctor] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  let doctorId = paramDoctorId || localStorage.getItem("doctorId");
   useEffect(() => {
+    if (!doctorId || doctorId === "undefined") {
+      setDoctor(null);
+      return;
+    }
     const fetchDoctor = async () => {
       try {
-        const res = await axios.get(`https://pilldispenser.onrender.com/api/doctor/${doctorId}`);
+        const res = await axios.get(`http://localhost:5000/api/doctor/${doctorId}`);
         setDoctor(res.data);
-      } catch (err) {
-        console.error("Error fetching doctor:", err.message);
+      } catch{
+        setDoctor(null);
       }
     };
-    if (doctorId) fetchDoctor();
-  }, [doctorId]);
+    fetchDoctor();
+  }, [doctorId, location.pathname]);
+
+  const handleMenu = (e) => setAnchorEl(e.currentTarget);
+  const handleClose = () => setAnchorEl(null);
+
+  const logout = () => {
+    localStorage.removeItem("doctorId");
+    handleClose();
+    navigate("/");
+  };
+
   return (
-    <nav className="navbar navbar-light bg-light shadow-sm">
-      <div className="container-fluid">
-        <div className="d-flex"><i className="bi bi-person-circle mx-2"></i><h5>{doctor?.name || "Doctor" }</h5></div>
-        <span className="navbar-brand fw-bold">MediTrack</span>
-        <button className="btn btn-danger btn-sm" onClick={() => navigate('/')}>Logout</button>
-      </div>
-    </nav>
+    <AppBar position="static" sx={{ bgcolor: "#1565C0" }} elevation={2}>
+      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <LocalHospitalIcon sx={{ mr: 1, fontSize: 32 }} />
+          <Typography variant="h6" fontWeight="bold">MediTrack</Typography>
+        </Box>
+        {doctor ? (
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Typography sx={{ mr: 2 }}>
+              Welcome, <b>{doctor.name || doctor.id}</b>
+            </Typography>
+            <IconButton onClick={handleMenu}>
+              <Avatar sx={{ bgcolor: "#f50057" }}>
+                {(doctor.name || doctor.id)[0] || "D"}
+              </Avatar>
+            </IconButton>
+            <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose}>
+              <MenuItem onClick={logout}>Logout</MenuItem>
+            </Menu>
+          </Box>
+        ) : (
+          <Typography>Doctor Portal</Typography>
+        )}
+      </Toolbar>
+    </AppBar>
   );
 }
-
 export default Navbar;
