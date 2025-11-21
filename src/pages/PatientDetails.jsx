@@ -41,11 +41,11 @@ function PatientDetails() {
         setError("");
 
         // Fetch patient details
-        const patientRes = await axios.get(`https://pilldispenser.onrender.com/api/patient/${id}`);
+        const patientRes = await axios.get(`http://localhost:5000/api/patient/${id}`);
         setPatient(patientRes.data);
 
         // Fetch medicines for patient
-        const medRes = await axios.get(`https://pilldispenser.onrender.com/api/medicines/${id}`);
+        const medRes = await axios.get(`http://localhost:5000/api/medicines/${id}`);
         setMedicines(medRes.data);
       } catch (err) {
         if (err.response?.status === 404) {
@@ -63,7 +63,7 @@ function PatientDetails() {
   // Delete a medicine
   const handleDeleteMedicine = async (medId) => {
     try {
-      await axios.delete(`https://pilldispenser.onrender.com/api/medicines/${medId}`);
+      await axios.delete(`http://localhost:5000/api/medicines/${medId}`);
       setMedicines((prev) => prev.filter((m) => m.id !== medId));
       setSuccess("Medicine deleted successfully");
     } catch (err) {
@@ -75,7 +75,7 @@ function PatientDetails() {
   const handleDeletePatient = async () => {
     if (!window.confirm("Are you sure you want to delete this patient?")) return;
     try {
-      await axios.delete(`https://pilldispenser.onrender.com/api/patient/${id}`);
+      await axios.delete(`http://localhost:5000/api/patient/${id}`);
       navigate(`/patients/${doctorId}`);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to delete patient");

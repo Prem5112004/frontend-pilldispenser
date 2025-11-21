@@ -24,13 +24,13 @@ function Dashboard() {
   useEffect(() => {
   async function fetchAll() {
     try {
-      const docRes = await axios.get(`https://pilldispenser.onrender.com/api/doctor/${doctorId}`);
+      const docRes = await axios.get(`http://localhost:5000/api/doctor/${doctorId}`);
       setDoctor(docRes.data);
-      const patRes = await axios.get(`https://pilldispenser.onrender.com/api/patients/${doctorId}`);
+      const patRes = await axios.get(`http://localhost:5000/api/patients/${doctorId}`);
       setPatients(patRes.data);
 
       // Fetch activity logs dynamically
-      const logRes = await axios.get(`https://pilldispenser.onrender.com/api/activity-log/${doctorId}`);
+      const logRes = await axios.get(`http://localhost:5000/api/activity-log/${doctorId}`);
       // Assume logRes.data is an array of { message, timestamp }
       const logsWithFormattedTime = logRes.data.map(entry => ({
         message: entry.message,
@@ -90,7 +90,7 @@ function Dashboard() {
                         <NoteAddIcon sx={{ fontSize: 38 }} />
                       </Avatar>
                       <Box>
-                        <Typography fontWeight="bold" fontSize={24}>Add Patient</Typography>
+                       <br/><Typography fontWeight="bold" fontSize={24}> Add Patient</Typography>
                         <Button
                           variant="contained"
                           color="secondary"
@@ -99,7 +99,7 @@ function Dashboard() {
                           onClick={() => navigate(`/add-patient/${doctorId}`)}
                         >
                           Add New Patient
-                        </Button>
+                        </Button><br/>
                       </Box>
                     </CardContent>
                   </Card>
@@ -111,7 +111,8 @@ function Dashboard() {
                       <Avatar sx={{ bgcolor: "primary.main", mr: 1, width: 52, height: 52 }}>
                         <LocalHospitalIcon />
                       </Avatar>
-                      <Box>
+                      {doctor ? (
+                        <Box sx={{ textAlign: "left" }}>
                         <Typography variant="subtitle1" fontWeight="bold">{doctor?.name}</Typography>
                         <Typography color="text.secondary" variant="body2">
                           {doctor?.specialty}
@@ -122,7 +123,8 @@ function Dashboard() {
                         <Typography color="text.secondary" variant="body2">
                           <span style={{ fontFamily: "monospace" }}>{doctorId}</span>
                         </Typography>
-                      </Box>
+                        </Box>
+                      ) : null}
                     </CardContent>
                   </Card>
                 </Grid>

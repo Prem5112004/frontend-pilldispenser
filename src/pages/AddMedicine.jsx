@@ -25,7 +25,7 @@ function AddMedicine() {
   useEffect(() => {
     const fetchPatient = async () => {
       try {
-        const res = await axios.get(`https://pilldispenser.onrender.com/api/patient/${patientId}`);
+        const res = await axios.get(`http://localhost:5000/api/patient/${patientId}`);
         setPatient(res.data);
         setError("");
       } catch{

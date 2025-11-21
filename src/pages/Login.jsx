@@ -17,7 +17,7 @@ function Login() {
     e.preventDefault();
     setError("");
     try {
-      const res = await axios.post("https://pilldispenser.onrender.com/api/doctors/login", { id, password });
+      const res = await axios.post("http://localhost:5000/api/doctors/login", { id, password });
       localStorage.setItem("doctorId", res.data.doctor.id);
       navigate(`/dashboard/${res.data.doctor.id}`);
     } catch (err) {

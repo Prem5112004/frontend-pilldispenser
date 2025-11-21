@@ -40,7 +40,7 @@ function AddPatient() {
       return;
     }
     try {
-      await axios.post("https://pilldispenser.onrender.com/api/patients/add", {
+      await axios.post("http://localhost:5000/api/patients/add", {
         ...data,
         doctorId // attach doctorId
       });
