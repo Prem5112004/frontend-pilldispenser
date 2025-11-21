@@ -21,7 +21,7 @@ function Register() {
     e.preventDefault();
     setError(""); setSuccess("");
     try {
-      await axios.post("http://localhost:5000/api/doctors/register", {
+      await axios.post("https://pilldispenser.onrender.com/api/doctors/register", {
         name, id, password, phoneno: phone, specialty
       });
       setSuccess("Registration successful! Redirecting to login...");
