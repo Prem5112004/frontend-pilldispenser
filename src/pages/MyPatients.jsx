@@ -29,7 +29,7 @@ function MyPatients() {
     async function fetchPatients() {
       try {
         setLoading(true);
-        const res = await axios.get(`http://localhost:5000/api/patients/${doctorId}`);
+        const res = await axios.get(`https://pilldispenser.onrender.com/api/patients/${doctorId}`);
         setPatients(res.data);
         setError("");
       } catch (err) {

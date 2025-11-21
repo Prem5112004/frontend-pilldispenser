@@ -21,7 +21,7 @@ function Navbar() {
     }
     const fetchDoctor = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/doctor/${doctorId}`);
+        const res = await axios.get(`https://pilldispenser.onrender.com/api/doctor/${doctorId}`);
         setDoctor(res.data);
       } catch{
         setDoctor(null);

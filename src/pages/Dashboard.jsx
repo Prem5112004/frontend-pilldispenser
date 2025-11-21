@@ -24,13 +24,13 @@ function Dashboard() {
   useEffect(() => {
   async function fetchAll() {
     try {
-      const docRes = await axios.get(`http://localhost:5000/api/doctor/${doctorId}`);
+      const docRes = await axios.get(`https://pilldispenser.onrender.com/api/doctor/${doctorId}`);
       setDoctor(docRes.data);
-      const patRes = await axios.get(`http://localhost:5000/api/patients/${doctorId}`);
+      const patRes = await axios.get(`https://pilldispenser.onrender.com/api/patients/${doctorId}`);
       setPatients(patRes.data);
 
       // Fetch activity logs dynamically
-      const logRes = await axios.get(`http://localhost:5000/api/activity-log/${doctorId}`);
+      const logRes = await axios.get(`https://pilldispenser.onrender.com/api/activity-log/${doctorId}`);
       // Assume logRes.data is an array of { message, timestamp }
       const logsWithFormattedTime = logRes.data.map(entry => ({
         message: entry.message,

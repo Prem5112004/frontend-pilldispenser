@@ -25,7 +25,7 @@ function AddMedicine() {
   useEffect(() => {
     const fetchPatient = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/patient/${patientId}`);
+        const res = await axios.get(`https://pilldispenser.onrender.com/api/patient/${patientId}`);
         setPatient(res.data);
         setError("");
       } catch{
@@ -45,7 +45,7 @@ function AddMedicine() {
     setFailMsg("");
     try {
       const time24 = scheduledTime ? format(scheduledTime, "HH:mm") : "";
-      const res = await axios.post("http://localhost:5000/api/medicines/add", {
+      const res = await axios.post("https://pilldispenser.onrender.com/api/medicines/add", {
         name: medicineName,
         scheduledTime: time24,
         patientId,
