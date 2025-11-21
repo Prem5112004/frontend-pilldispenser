@@ -26,7 +26,7 @@ function Dashboard() {
     try {
       const docRes = await axios.get(`https://pilldispenser.onrender.com/api/doctor/${doctorId}`);
       setDoctor(docRes.data);
-      const patRes = await axios.get(`https://pilldispenser.onrender.comapi/patients/${doctorId}`);
+      const patRes = await axios.get(`https://pilldispenser.onrender.com/api/patients/${doctorId}`);
       setPatients(patRes.data);
 
       // Fetch activity logs dynamically
